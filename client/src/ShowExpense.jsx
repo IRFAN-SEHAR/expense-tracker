@@ -1,7 +1,13 @@
 import React, {useState , useEffect} from "react";
 function ShowExpense(props){
   const [isEditing , setIsEditing] = useState(false);
-  const [date, selectDate] =useState();
+  const [selectDate, setSelectDate] =useState();
+const months = [
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December"
+];
+
 
   // const [title , setTitle] =useState(props.title);
   // const [category , setCategory] = useState(props.category);
@@ -45,6 +51,13 @@ setExpense(prev=>{
   
     return(
         <div>
+        <select>
+  {months.map((month, index) => (
+    <option key={index} value={index}>
+      {month}
+    </option>
+  ))}
+</select>
           {isEditing ? (
             <form >
                <label htmlFor="title">title</label>
