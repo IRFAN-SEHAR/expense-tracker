@@ -2,23 +2,16 @@ import React, {useState , useEffect} from "react";
 function ShowExpense(props){
   const [isEditing , setIsEditing] = useState(false);
   const [selectDate, setSelectDate] =useState();
-const months = [
-  "January", "February", "March", "April",
-  "May", "June", "July", "August",
-  "September", "October", "November", "December"
-];
 
 
-  // const [title , setTitle] =useState(props.title);
-  // const [category , setCategory] = useState(props.category);
-  // const [amount , setAmount] = useState(props.amount);
-  // const [expenseDate , setExpenseDate] = useState(props.expenseDate);
+
+ 
 
   const [expense , setExpense] = useState({
     title: props.title,
     category: props.category,
     amount: props.amount,
-    expenseDate: props.expenseDate,
+    expense_date: props.expense_date,
   })
   function handleChanges(e){
     
@@ -40,7 +33,7 @@ setExpense(prev=>{
     !expense.title ||
     !expense.category ||
     !expense.amount ||
-    !expense.expenseDate
+    !expense.expense_date
   ) {
     alert("Please fill all fields");
     return;
@@ -50,14 +43,9 @@ setExpense(prev=>{
 
   
     return(
+      
         <div>
-        <select>
-  {months.map((month, index) => (
-    <option key={index} value={index}>
-      {month}
-    </option>
-  ))}
-</select>
+
           {isEditing ? (
             <form >
                <label htmlFor="title">title</label>
@@ -66,8 +54,8 @@ setExpense(prev=>{
             <input  value={expense.category} onChange={handleChanges} type="category"  id="category" name="category" pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
             <label htmlFor="amount">amount</label>
             <input value={expense.amount}  onChange={handleChanges} min={0} type="number" id="amount" name="amount" placeholder=" in Rs e.g 500rs" required/>
-            <label htmlFor="expenseDate">expense date</label>
-            <input value={expense.expenseDate} onChange={handleChanges}  type="date" name="expenseDate" id="expenseDate" required />
+            <label htmlFor="expense_date">expense date</label>
+            <input value={expense.expense_date} onChange={handleChanges}  type="d ate" name="expense_date" id="expense_date" required />
             <button type="submit" onClick={handleClicks}>save</button>
             </form>
           ):(
@@ -75,7 +63,7 @@ setExpense(prev=>{
              <p>{props.title}</p>
               <p>{props.category}</p>
                 <p>{props.amount}</p>
-                  <p>{props.expenseDate}</p>
+                  <p>{props.expense_date}</p>
                   <button onClick={()=>props.onDelete(props.id)}>delete</button>
                   <button onClick={()=>setIsEditing(true)} >update</button>
                   </>

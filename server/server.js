@@ -1,0 +1,114 @@
+import express from "express"
+import dotenv from "dotenv"
+import bodyParser, { urlencoded } from "body-parser"
+import cors from "cors"
+import pg from "pg"
+dotenv.config()
+const app = express();
+const port = 3000;
+const db=new pg.Client({
+user:process.env.DB_USER,
+host:process.env.DB_HOST,
+database:process.env.DB_DATABASE,
+password:process.env.DB_PASSWORD,
+port:5432
+})
+db.connect();
+
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.json());
+app.use(cors({origin: "*" }))
+app.use(express.static("public"));
+app.get("/data", async(req,res)=>{
+    const month = req.query.month;
+    const year = req.query.year;
+      
+    // console.log(month)
+   try {
+  let result;
+
+  
+  if (month > 0 && year) {
+    result = await db.query(
+      `SELECT * FROM data
+       WHERE EXTRACT(MONTH FROM expense_date)::int = $1
+       AND EXTRACT(YEAR FROM expense_date)::int = $2`,
+      [month, year]
+    );
+
+  
+  } else if (month > 0) {
+    result = await db.query(
+      `SELECT * FROM data
+       WHERE EXTRACT(MONTH FROM expense_date)::int = $1`,
+      [month]
+    );
+
+  
+  } else if (month === 0 && year) {
+    result = await db.query(
+      `SELECT * FROM data
+       WHERE EXTRACT(YEAR FROM expense_date)::int = $1`,
+      [year]
+    );
+
+  
+  } else if (year) {
+    result = await db.query(
+      `SELECT * FROM data
+       WHERE EXTRACT(YEAR FROM expense_date)::int = $1`,
+      [year]
+    );
+
+  
+  } else {
+    result = await db.query(`SELECT * FROM data`);
+  }
+
+  console.log(result.rows);
+  res.json(result.rows);
+
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ error: "Internal Server Error" });
+}
+});
+app.post("/data" , async(req ,res)=>{
+    const {title , category , amount , expense_date} = req.body
+    console.log(req.body)
+    try {
+       const result = await db.query("INSERT INTO data(title , category , amount , expense_date) VALUES($1 , $2 , $3 , $4) RETURNING *",
+            [title , category , amount , expense_date]
+        );
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500).send("Erorr adding data to db!!");
+    }
+});
+app.put("/data/:id" , async(req,res)=>{
+try {
+    const {title , category , amount , expense_date} =req.body
+    const id = req.params.id;
+    await db.query("UPDATE data SET title = $1 , category = $2 , amount = $3 , expense_date = $4 WHERE id=$5",
+        [title , category , amount , expense_date , id]
+       
+    );
+     res.json({message:"Updated successfully!"})
+} catch (error) {
+    res.sendStatus(500).json({message:"Error updating data!"})
+}
+});
+app.delete("/data/:id" , async(req, res)=>{
+    try {
+         const id = req.params.id
+    await db.query("DELETE FROM data WHERE id=$1",[id]);
+    res.json({message:"Deleted successfully!"});
+    } catch (error) {
+        res.sendStatus(500).json({message:"Error deleting the data!"});
+    }
+   
+});
+app.listen(port ,"0.0.0.0" ,  ()=>{
+    console.log(`this app is listeninig on ${port}!`);
+});

@@ -5,7 +5,7 @@ function AddExpense(props){
         title:"",
         category:"",
         amount:"",
-        expenseDate: "",
+        expense_date: "",
 });
 const [isAdd , setIsAdd] = useState(false);
 
@@ -22,13 +22,13 @@ const [isAdd , setIsAdd] = useState(false);
 }
           
      
-    function handleClick(event){
+  async  function handleClick(event){
          event.preventDefault()
           if (
     !items.title ||
     !items.category ||
     !items.amount ||
-    !items.expenseDate
+    !items.expense_date
   ) {
     alert("Please fill all fields");
     
@@ -40,7 +40,17 @@ const [isAdd , setIsAdd] = useState(false);
             id: Date.now()
 
      } );
-      
+    
+        await fetch(("http://localhost:3000/data"),{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(items)
+            
+        })
+
+    
        
 
         setItems(
@@ -48,7 +58,7 @@ const [isAdd , setIsAdd] = useState(false);
          title:"",
         category:"",
         amount:"",
-         expenseDate:"",
+         expense_date:"",
             }
         )
         
@@ -67,8 +77,8 @@ return(
             <input onChange={handleChange} type="text" id="category" name="category" value={items.category}  pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
             <label htmlFor="amount">amount</label>
             <input onChange={handleChange} type="number" id="amount" name="amount" value={items.amount} min={0} placeholder=" in Rs e.g 500rs" required/>
-            <label htmlFor="expenseDate">expense date</label>
-            <input onChange={handleChange} type="date" name="expenseDate" id="expenseDate" required />
+            <label htmlFor="expense_date">expense date</label>
+            <input onChange={handleChange} type="date" name="expense_date" id="expense_date" required />
           
            <button type="submit" onClick={(event)=>{handleClick(event)}} >save</button>
         </form>
