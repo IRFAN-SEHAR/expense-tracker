@@ -1,5 +1,6 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 function CalculateExpense(props){
+    const [items , setItems]=[""];
 return(
     <div>
         <p>Total of this month</p>

@@ -36,7 +36,7 @@ useEffect(()=>{
       const response = await fetch(`http://localhost:3000/data?month=${selectedMonth}&year=${selectedYear}`);
       const result = await response.json();
       setItem(result);
-      console.log(result);
+      console.log(result.total);
     } catch (err) {
       console.error(err);
     }

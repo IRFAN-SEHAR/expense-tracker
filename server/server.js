@@ -1,4 +1,4 @@
-import express from "express"
+import express, { response } from "express"
 import dotenv from "dotenv"
 import bodyParser, { urlencoded } from "body-parser"
 import cors from "cors"
@@ -22,19 +22,29 @@ app.use(express.static("public"));
 app.get("/data", async(req,res)=>{
     const month = req.query.month;
     const year = req.query.year;
-      
+    const monthSum=req.query.monthSum;
+    const yearSum = req.query.yearSum;  
     // console.log(month)
    try {
   let result;
 
   
   if (month > 0 && year) {
-    result = await db.query(
+    expenses = await db.query(
       `SELECT * FROM data
        WHERE EXTRACT(MONTH FROM expense_date)::int = $1
        AND EXTRACT(YEAR FROM expense_date)::int = $2`,
       [month, year]
     );
+    const total = await db.query(
+    `SELECT SUM(amount) AS total_expense
+     FROM data
+     WHERE EXTRACT(MONTH FROM expense_date)::int = $1
+       AND EXTRACT(YEAR FROM expense_date)::int = $2`,
+    [month, year]
+);
+
+
 
   
   } else if (month > 0) {
@@ -63,16 +73,27 @@ app.get("/data", async(req,res)=>{
   
   } else {
     result = await db.query(`SELECT * FROM data`);
+   
   }
 
   console.log(result.rows);
-  res.json(result.rows);
+  // res.json(result.rows);
+  res.json({
+    expenses: expenses.rows,
+    total: total.rows[0].total_expense
+   
+});
+ console.log(total)
 
 } catch (error) {
   console.error(error);
   res.status(500).json({ error: "Internal Server Error" });
 }
 });
+app.get("/data", async(req,res)=>{
+ response = await db.query(`SELECT SUM(amount) AS total_expense FROM data`)
+    console.log(response);
+})
 app.post("/data" , async(req ,res)=>{
     const {title , category , amount , expense_date} = req.body
     console.log(req.body)
