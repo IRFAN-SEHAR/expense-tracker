@@ -6,8 +6,11 @@ import CalculateExpense from "./CalculateExpense";
 import ShowExpense from "./ShowExpense";
 import Header from "./Header";
 import Footer from "./Footer";
+import Register from "./Register";
+import Login from "./Login";
 function App(){
   const [item , setItem] = useState([]);
+  const [total , setTotal]=useState(0);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const months = [
@@ -35,8 +38,11 @@ useEffect(()=>{
     try {
       const response = await fetch(`http://localhost:3000/data?month=${selectedMonth}&year=${selectedYear}`);
       const result = await response.json();
-      setItem(result);
-      console.log(result.total);
+      setItem(result.expenses);
+      setTotal(result.total);
+
+      console.log(result.expenses);
+      console.log(result.total)
     } catch (err) {
       console.error(err);
     }
@@ -85,6 +91,8 @@ setItem(prev=>
 }
   return(
     <div>
+      <Login/>
+      <Register />
        <Header/>
       <AddExpense onAdd={addItems}/>
              <select value={selectedMonth} onChange={(e)=>setSelectedMonth(e.target.value)}>
@@ -95,6 +103,7 @@ setItem(prev=>
     </option>
   ))}
 </select>
+
 <select value={selectedYear} onChange={(e)=>setSelectedYear(e.target.value)}>
   <option value="">All</option>
   {years.map((year , index)=>(
@@ -103,6 +112,7 @@ setItem(prev=>
 </option>
   ))}
 </select>
+<h2>Total Expense: Rs. {total ?? 0}</h2>
       {item.map((e , index)=>(
           <ShowExpense
           key={index}
@@ -115,6 +125,7 @@ setItem(prev=>
           onUpdate={update}
           />
       ))}
+      
       <CalculateExpense />
       <Footer/>
     </div>

@@ -1,4 +1,4 @@
-import express, { response } from "express"
+import express from "express"
 import dotenv from "dotenv"
 import bodyParser, { urlencoded } from "body-parser"
 import cors from "cors"
@@ -22,11 +22,11 @@ app.use(express.static("public"));
 app.get("/data", async(req,res)=>{
     const month = req.query.month;
     const year = req.query.year;
-    const monthSum=req.query.monthSum;
-    const yearSum = req.query.yearSum;  
+   
     // console.log(month)
    try {
-  let result;
+  let expenses;
+  let total;
 
   
   if (month > 0 && year) {
@@ -36,7 +36,7 @@ app.get("/data", async(req,res)=>{
        AND EXTRACT(YEAR FROM expense_date)::int = $2`,
       [month, year]
     );
-    const total = await db.query(
+     total = await db.query(
     `SELECT SUM(amount) AS total_expense
      FROM data
      WHERE EXTRACT(MONTH FROM expense_date)::int = $1
@@ -48,23 +48,34 @@ app.get("/data", async(req,res)=>{
 
   
   } else if (month > 0) {
-    result = await db.query(
+    expenses = await db.query(
       `SELECT * FROM data
        WHERE EXTRACT(MONTH FROM expense_date)::int = $1`,
       [month]
     );
+        total = await db.query(
+    `SELECT SUM(amount) AS total_expense
+     FROM data
+     WHERE EXTRACT(MONTH FROM expense_date)::int = $1`,
+    [month]
+);
 
   
   } else if (month === 0 && year) {
-    result = await db.query(
+    expenses = await db.query(
       `SELECT * FROM data
        WHERE EXTRACT(YEAR FROM expense_date)::int = $1`,
       [year]
     );
-
+    total = await db.query(
+    `SELECT SUM(amount) AS total_expense
+     FROM data
+     WHERE EXTRACT(YEAR FROM expense_date)::int = $2`,
+    [year]
+);
   
   } else if (year) {
-    result = await db.query(
+    expenses = await db.query(
       `SELECT * FROM data
        WHERE EXTRACT(YEAR FROM expense_date)::int = $1`,
       [year]
@@ -72,17 +83,20 @@ app.get("/data", async(req,res)=>{
 
   
   } else {
-    result = await db.query(`SELECT * FROM data`);
+    expenses = await db.query(`SELECT * FROM data`);
+        total = await db.query(
+    `SELECT SUM(amount) AS total_expense
+     FROM data`);
    
   }
 
-  console.log(result.rows);
+  // console.log(result.rows);
   // res.json(result.rows);
   res.json({
-    expenses: expenses.rows,
-    total: total.rows[0].total_expense
+    expenses:expenses.rows,
+    total:total.rows[0].total_expense
    
-});
+   });
  console.log(total)
 
 } catch (error) {
@@ -90,10 +104,10 @@ app.get("/data", async(req,res)=>{
   res.status(500).json({ error: "Internal Server Error" });
 }
 });
-app.get("/data", async(req,res)=>{
- response = await db.query(`SELECT SUM(amount) AS total_expense FROM data`)
-    console.log(response);
-})
+// app.get("/data", async(req,res)=>{
+//  response = await db.query(`SELECT SUM(amount) AS total_expense FROM data`)
+//     console.log(response);
+// })
 app.post("/data" , async(req ,res)=>{
     const {title , category , amount , expense_date} = req.body
     console.log(req.body)
