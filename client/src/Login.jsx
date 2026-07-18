@@ -1,17 +1,38 @@
-import React from "react";
+import React ,{useState} from "react";
 function Login(){
+    const [items , setItems]=useState({
+        username:"",
+        password:""
+    })
+function handleChange(event){
+    const {name , value}=event.target
+    setItems(prevItems=>({
+        ...prevItems,
+        [name]:value
+}))
+}
+async function handleClick(event){
+    event.preventDefault();
+    await fetch(("http://localhost:3000/users"),{
+        method:"POST",
+        headers:{
+            "Content-type":"application/json"
+        },
+        body:JSON.stringify(items)
+    })
+}
 return(
     <div>
-        <form action="login" method="POST">
+        <form>
             <div>
                 <label htmlFor="email">email</label>
-                <input type="email" name="email" id="email" autoComplete="email" />
+                <input onChange={handleChange} type="email" name="username" id="email" value={items.username} autoComplete="email" required/>
             </div>
             <div>
                 <label htmlFor="password" name="password" >password</label>
-                <input type="password" name="password" id="password" autoComplete="current-password" />
+                <input onChange={handleChange} type="password" name="password" id="password" value={items.password} autoComplete="current-password" required/>
             </div>
-            <button type="submit" >ok</button>
+            <button type="submit" onClick={event=>handleClick(event)} >Login</button>
         </form>
     </div>
 )
