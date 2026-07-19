@@ -2,6 +2,9 @@ import express from "express"
 import dotenv from "dotenv"
 import bodyParser, { urlencoded } from "body-parser"
 import bcrypt, {hash,hashSync} from "bcrypt"
+import passport from "passport"
+import { Strategy } from "passport-local"
+import session from "express-session";
 import cors from "cors"
 import pg from "pg"
 dotenv.config()
@@ -21,47 +24,58 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json());
 app.use(cors({origin: "*" }))
 app.use(express.static("public"));
-app.post("/users", async(req, res)=>{
+app.post("/signup", async(req, res)=>{
   const email= req.body.username;
   const planeTextPassword = req.body.password;
   try {
     const checkResult = await db.query(`SELECT * FROM users WHERE email=$1`,[email]);
     if (checkResult.rows.length>0) {
       res.json("email already exits please login!");
+      console.log("Email already exit please login!")
     } else {
-     await bcrypt.hash(planeTextPassword , saltRounds , (err , hash)=>{
-         db.query(`INSERT INTO users (email , password_hash) VALUES($1 , $2)`,[email , hash]);
-       
-      });
+     const HashedPassword= await bcrypt.hash(planeTextPassword , saltRounds)
+        await db.query(`INSERT INTO users (email , password_hash) VALUES($1 , $2)`,[email , HashedPassword]);
+       res.status(200).send("this is ok!!")
+       console.log("this is ok!")
     }
   } catch (error) {
     console.log(error)
     res.sendStatus(500).send("error entering data!");
+    console.log("error entering data to the db!")
+    
   }
 })
-app.post("/users", async(req,res)=>{
+app.post("/login", async(req,res)=>{
   const email = req.body.username;
   const password = req.body.password;
   try {
     const result = await db.query(`SELECT * FROM users WHERE email=$1`,[email])
     if (result.rows.length>0) {
-       const savedHashedPassword = result.rows[0].password
+       const savedHashedPassword = result.rows[0].password_hash
        bcrypt.compare(password , savedHashedPassword,(err , result)=>{
         if (err) {
           console.log("error compairing password" , err)
+          console.log("error compairing password!")
         } else {
           if (result) {
-            res.redirect("/")
+            res.status(200).send("login page is ok!!")
+            console.log("authorized!")
           } else {
-            console.log("password is incorrect!");
+            res.status(401).json({
+    message: "Incorrect password"
+});
+console.log("Incorrrect Password!")
+
           }
           
         }
        })
   
     } else {
-      res.send("user not found")
-      alert("User not found!")
+      res.status(404).json({
+    message: "User not found"
+});
+      console.log("User not found!");
     }
    
   } catch (error) {
