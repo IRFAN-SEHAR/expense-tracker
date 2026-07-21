@@ -13,13 +13,17 @@ function handleChange(event){
 }
 async function handleClick(event){
     event.preventDefault();
-    await fetch(("http://localhost:3000/users"),{
+    await fetch(("http://localhost:3000/login"),{
         method:"POST",
         headers:{
             "Content-type":"application/json"
         },
+        credentials: "include",
         body:JSON.stringify(items)
-    })
+    });
+    console.log(response.status);
+    const data = await response.json();
+console.log(data);
 }
 return(
     <div>

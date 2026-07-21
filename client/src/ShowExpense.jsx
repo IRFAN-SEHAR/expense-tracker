@@ -3,10 +3,6 @@ function ShowExpense(props){
   const [isEditing , setIsEditing] = useState(false);
   const [selectDate, setSelectDate] =useState();
 
-
-
- 
-
   const [expense , setExpense] = useState({
     title: props.title,
     category: props.category,

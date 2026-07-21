@@ -13,11 +13,12 @@ function Register(){
     }
    async function handleClick(event){
     event.preventDefault()
-             await fetch(("http://localhost:3000/users"),{
+             await fetch(("http://localhost:3000/signup"),{
                 method:"POST",
                 headers:{
                     "Content-Type" : "application/json"
                 },
+                credentials: "include",
                 body:JSON.stringify(items)
              })
         

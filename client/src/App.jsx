@@ -2,7 +2,6 @@ import React , {useState , useEffect} from "react";
 import axios from "axios";
 import "./App.css";
 import AddExpense from "./AddExpense";
-import CalculateExpense from "./CalculateExpense";
 import ShowExpense from "./ShowExpense";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -36,7 +35,11 @@ useEffect(()=>{
 },[selectedMonth , selectedYear]);
   async function getData() {
     try {
-      const response = await fetch(`http://localhost:3000/data?month=${selectedMonth}&year=${selectedYear}`);
+      const response = await fetch(`http://localhost:3000/data?month=${selectedMonth}&year=${selectedYear}`,
+        {
+            credentials: "include",
+        }
+      );
       const result = await response.json();
       setItem(result.expenses);
       setTotal(result.total);
@@ -54,7 +57,7 @@ useEffect(()=>{
 function del(id){
 fetch(`http://localhost:3000/data/${id}`,{
   method:"DELETE",
-
+credentials: "include"
 })
 .then(res=>res.json())
 .then(()=>{
@@ -72,6 +75,7 @@ function update(id , updateNote){
     headers:{
       "Content-Type":"application/json"
     },
+    credentials: "include",
     body:JSON.stringify(updateNote)
     
     
@@ -109,7 +113,7 @@ setItem(prev=>
   {years.map((year , index)=>(
 <option key={index} value={year}>
   {year}
-</option>
+</option>    
   ))}
 </select>
 <h2>Total Expense: Rs. {total ?? 0}</h2>
@@ -126,7 +130,7 @@ setItem(prev=>
           />
       ))}
       
-      <CalculateExpense />
+     
       <Footer/>
     </div>
   )
