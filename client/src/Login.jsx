@@ -1,5 +1,5 @@
 import React ,{useState} from "react";
-function Login(){
+function Login({onLoginSuccess}){
     const [items , setItems]=useState({
         username:"",
         password:""
@@ -13,7 +13,7 @@ function handleChange(event){
 }
 async function handleClick(event){
     event.preventDefault();
-    await fetch(("http://localhost:3000/login"),{
+   const response =  await fetch(("http://localhost:3000/login"),{
         method:"POST",
         headers:{
             "Content-type":"application/json"
@@ -23,6 +23,12 @@ async function handleClick(event){
     });
     console.log(response.status);
     const data = await response.json();
+    if (response.ok && data.success) {
+        onLoginSuccess(data.user);
+    }else{
+        console.log("error login show!")
+    }
+    
 console.log(data);
 }
 return(

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-function Register(){
+function Register({onRegisterSuccess}){
     const [items , setItems] = useState({
         username:"",
         password:""
@@ -13,7 +13,7 @@ function Register(){
     }
    async function handleClick(event){
     event.preventDefault()
-             await fetch(("http://localhost:3000/signup"),{
+          const response =    await fetch(("http://localhost:3000/signup"),{
                 method:"POST",
                 headers:{
                     "Content-Type" : "application/json"
@@ -21,7 +21,13 @@ function Register(){
                 credentials: "include",
                 body:JSON.stringify(items)
              })
-        
+           
+    if (response.ok) {
+        onRegisterSuccess();
+    }else{
+        console.log("error login show!")
+    }
+    
             
         
     }
