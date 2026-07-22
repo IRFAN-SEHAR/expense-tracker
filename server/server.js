@@ -23,7 +23,7 @@ port:5432
 app.use(session({
   secret:process.env.SESSION_SECRET,
   resave:false,
-  saveUninitialized:true,
+  saveUninitialized:false,
    cookie: {
       secure: false, // true only when using HTTPS in production
       maxAge: 1000 * 60 * 60 * 24 // 1 day
@@ -37,19 +37,29 @@ db.connect();
 
 app.use(cors({origin: "http://localhost:5173" , credentials: true, }))
 app.use(express.static("public"));
+function ensureAuthenticated(req , res ,next){
+  if (req.isAuthenticated()) {
+    return next()
+  } 
+    return res.status(401).send({message: "Not Authenticated!"})
+  
+}
 app.post("/signup", async(req, res)=>{
   const email= req.body.username;
   const planeTextPassword = req.body.password;
+  if (!email || !planeTextPassword) {
+    res.status(400).send({message:"Email and Password are required!"})
+  }
   try {
     const checkResult = await db.query(`SELECT * FROM users WHERE email=$1`,[email]);
     if (checkResult.rows.length>0) {
-      res.json("email already exits please login!");
+      res.status(409).json("email already exits please login!");
       console.log("Email already exit please login!")
     } else {
      const HashedPassword= await bcrypt.hash(planeTextPassword , saltRounds)
         await db.query(`INSERT INTO users (email , password_hash) VALUES($1 , $2)`,[email , HashedPassword]);
-       res.status(200).send("this is ok!!")
-       console.log("this is ok!")
+       res.status(200).send("sighned Up")
+       console.log("sighned Up")
     }
   } catch (error) {
     console.log(error)
@@ -83,6 +93,30 @@ app.post("/login", (req, res, next) => {
     });
   })(req, res, next);
 });
+
+
+app.get("/me", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ user: req.user });
+  } else {
+    res.status(401).json({ user: null });
+  }
+});
+ 
+app.get("/me", (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.json({ user: req.user });
+  }
+  return res.status(401).json({ message: "Not authenticated" });
+});
+ 
+app.post("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.json({ message: "Logged out successfully!" });
+  });
+});
+
 passport.serializeUser((user , cb)=>{
   cb(null , user.id)
 });
@@ -103,8 +137,7 @@ passport.deserializeUser(async(id, cb)=>{
        const savedHashedPassword = user.password_hash
        bcrypt.compare(password , savedHashedPassword,(err , result)=>{
         if (err) {
-          console.log("error compairing password" , err)
-          console.log("error compairing password!")
+          console.error("Error comparing password!", err);
            return cb(err);
         } else {
           if (result) {
@@ -112,11 +145,9 @@ passport.deserializeUser(async(id, cb)=>{
             console.log("authorized!")
              return cb(null , user);
           } else {
-//             res.status(401).json({
-//     message: "Incorrect password"
-// });
+   console.log("Incorrrect Password!")
  return cb(null , false);
-console.log("Incorrrect Password!")
+
 
           }
           
@@ -124,11 +155,9 @@ console.log("Incorrrect Password!")
        })
   
     } else {
-//       res.status(404).json({
-//     message: "User not found"
-// });
-      // console.log("User not found!");
-       return cb("User not found");
+ console.log("User not found!");
+        return cb(null, false);
+       
     }
    
   } catch (error) {
@@ -138,11 +167,13 @@ console.log("Incorrrect Password!")
   )
 
 
-app.get("/data", async(req,res)=>{
-    const month = req.query.month;
-    const year = req.query.year;
+app.get("/data", ensureAuthenticated , async(req,res)=>{
+    const monthRaw = req.query.month;
+    const yearRaw = req.query.year;
    
     // console.log(month)
+      const month = monthRaw !== undefined && monthRaw !== "" ? Number(monthRaw) : null;
+  const year = yearRaw !== undefined && yearRaw !== "" ? Number(yearRaw) : null;
    try {
   let expenses;
   let total;
@@ -206,6 +237,13 @@ app.get("/data", async(req,res)=>{
        AND EXTRACT(YEAR FROM expense_date)::int = $2`,
       [req.user.id, year]
     );
+       total = await db.query(
+        `SELECT SUM(amount) AS total_expense
+         FROM data
+         WHERE user_id = $1
+         AND EXTRACT(YEAR FROM expense_date)::int = $2`,
+        [req.user.id, year]
+      );
 
   
   } else {
@@ -234,7 +272,7 @@ app.get("/data", async(req,res)=>{
 //  response = await db.query(`SELECT SUM(amount) AS total_expense FROM data`)
 //     console.log(response);
 // })
-app.post("/data" , async(req ,res)=>{
+app.post("/data" , ensureAuthenticated, async(req ,res)=>{
     const {title , category , amount , expense_date} = req.body
     const user = req.user.id
     // console.log(req.body)
@@ -248,7 +286,7 @@ app.post("/data" , async(req ,res)=>{
         res.sendStatus(500).send("Erorr adding data to db!!");
     }
 });
-app.put("/data/:id" , async(req,res)=>{
+app.put("/data/:id" , ensureAuthenticated, async(req,res)=>{
 try {
     const {title , category , amount , expense_date} =req.body
     const id = req.params.id;
@@ -262,7 +300,7 @@ try {
     res.sendStatus(500).json({message:"Error updating data!"})
 }
 });
-app.delete("/data/:id" , async(req, res)=>{
+app.delete("/data/:id" ,ensureAuthenticated, async(req, res)=>{
     try {
          const id = req.params.id
          const user = req.user.id
