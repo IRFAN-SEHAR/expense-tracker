@@ -44,7 +44,14 @@ return(
             </div>
             <button type="submit" onClick={event=>handleClick(event)} >Login</button>
         </form>
-    </div>
+         
+          
+            <a className="btn btn-block" href="http://localhost:3000/auth/google" role="button">
+              <i className="fab fa-google"></i>
+              Sign In with Google
+            </a>
+          </div>
+       
 )
 };
 export default Login;

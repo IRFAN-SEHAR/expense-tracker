@@ -44,7 +44,13 @@ function Register({onRegisterSuccess}){
             </div>
             <button type="submit" onClick={(event)=>{handleClick(event)}}>ok</button>
             </form>
-        </div>
+        
+            <a className="btn btn-block" href="http://localhost:3000/auth/google"role="button">
+              <i className="fab fa-google"></i>
+              Sign Up with Google
+            </a>
+          </div>
+       
     )
 };
 export default Register;

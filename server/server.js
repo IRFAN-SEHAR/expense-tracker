@@ -4,6 +4,7 @@ import bodyParser, { urlencoded } from "body-parser"
 import bcrypt, {hash,hashSync} from "bcrypt"
 import passport from "passport"
 import { Strategy } from "passport-local"
+import GoogleStrategy from "passport-google-oauth20"
 import session from "express-session";
 import cors from "cors"
 import pg from "pg"
@@ -70,7 +71,7 @@ app.post("/signup", async(req, res)=>{
 })
 // app.post("/login", async(req,res)=>{
 //   const email = req.body.username;
-//   const password = req.body.password;
+//   const password = req.body.password; 
 //   })
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user) => {
@@ -102,17 +103,30 @@ app.get("/me", (req, res) => {
     res.status(401).json({ user: null });
   }
 });
- 
-app.get("/me", (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.json({ user: req.user });
+ app.get("/auth/google" , 
+  passport.authenticate("google",{
+    scope: ["profile" , "email"],
+    prompt: "select_account"
+  }));
+ app.get("/auth/google/callback" ,
+  passport.authenticate("google",{
+   failureRedirect: "/login"
+  }),
+  (req,res)=>{
+    res.redirect("http://localhost:5173")
   }
-  return res.status(401).json({ message: "Not authenticated" });
-});
+)
+// app.get("/me", (req, res) => {
+//   if (req.isAuthenticated()) {
+//     return res.json({ user: req.user });
+//   }
+//   return res.status(401).json({ message: "Not authenticated" });
+// });
  
 app.post("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
+    res.clearCookie("connect.sid");
     res.json({ message: "Logged out successfully!" });
   });
 });
@@ -128,7 +142,7 @@ passport.deserializeUser(async(id, cb)=>{
     cb(error)
   }
 });
-  passport.use(
+  passport.use("local",
     new Strategy(async function verify(username,password,cb) {
         try {
     const result = await db.query(`SELECT * FROM users WHERE email=$1`,[username])
@@ -165,7 +179,30 @@ passport.deserializeUser(async(id, cb)=>{
   }
     })
   )
-
+passport.use("google" , 
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL:"http://localhost:3000/auth/google/callback",
+      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    } ,async (accessToken , refreshToken , profile , cb)=>{
+      try {
+        console.log(profile)
+        const email = profile.emails[0].value;
+        const result = await db.query("SELECT * FROM users WHERE email=$1", [email]);
+        if (result.rows.length===0) {
+          const newUser = await db.query("INSERT INTO users (email , password_hash , profile_picture , name) VALUES($1 , $2 , $3 , $4) RETURNING *", 
+            [profile.emails[0].value , "Google" , profile.photos[0].value , profile.displayName])
+              return cb(null , newUser.rows[0]);
+        } else {
+          return cb(null , result.rows[0]);
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    }
+  ))
 
 app.get("/data", ensureAuthenticated , async(req,res)=>{
     const monthRaw = req.query.month;
