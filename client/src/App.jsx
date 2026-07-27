@@ -7,16 +7,15 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Register from "./Register";
 import Login from "./Login";
+import Profile from "./Profile";
 
 function App() {
   const [item, setItem] = useState([]);
   const [total, setTotal] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState("0");
   const [selectedYear, setSelectedYear] = useState("");
-
-  // ---- Auth state ----
-  const [user, setUser] = useState(null);       // null = logged out, object = logged in
-  const [authChecked, setAuthChecked] = useState(false); // has the initial "am I logged in" check run yet
+  const [user, setUser] = useState(null);       
+  const [authChecked, setAuthChecked] = useState(false); 
   const [showRegister, setShowRegister] = useState(false);
 
   const months = [
@@ -195,7 +194,7 @@ function App() {
           </option>
         ))}
       </select>
-
+      <Profile/>
       <h2>Total Expense: Rs. {total ?? 0}</h2>
 
       {(item ?? []).map((e, index) => (
@@ -210,6 +209,7 @@ function App() {
           onUpdate={update}
         />
       ))}
+      
 
       <Footer />
     </div>
