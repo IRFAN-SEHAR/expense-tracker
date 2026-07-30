@@ -9,7 +9,7 @@ function Profile(){
     }
  return(
    <div style={{ textAlign: "center", marginTop: "50px" }}>
-    <img src={profilePic || "https://via.placeholder.com/150" }alt="profile pic"     style={{
+    <img src={profilePic || "https://via.placeholder.com/150" } alt="profile pic"     style={{
           width: "150px",
           height: "150px",
           borderRadius: "50%",
