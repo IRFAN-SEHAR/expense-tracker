@@ -6,8 +6,11 @@ import passport from "passport"
 import { Strategy } from "passport-local"
 import GoogleStrategy from "passport-google-oauth20"
 import session from "express-session";
+import multer from "multer"
+import path from "path"
 import cors from "cors"
 import pg from "pg"
+import { profile } from "console"
 dotenv.config()
 const app = express();
 app.use(bodyParser.urlencoded({extended:true}));
@@ -34,8 +37,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 db.connect();
-
-
+const storage = multer.diskStorage({
+  destination: (req , file , cb)=>{
+    cb(null , "/uploads")
+  },
+  filename: (req , file , cb)=>{
+    const uniqueName =  Date.now + path.extname(file.originalname)
+    cb(null , uniqueName)
+  },
+});
+const upload = multer({storage})
+app.use("/uploads", express.static("uploads"));
 app.use(cors({origin: "http://localhost:5173" , credentials: true, }))
 app.use(express.static("public"));
 function ensureAuthenticated(req , res ,next){
@@ -322,6 +334,17 @@ app.post("/data" , ensureAuthenticated, async(req ,res)=>{
         console.log(error)
         res.sendStatus(500).send("Erorr adding data to db!!");
     }
+});
+app.put("/upload-profile" , ensureAuthenticated , upload.single(profile) , async(req,res)=>{
+try {
+   const {profile_picture} = req.body
+  const user = req.user.id
+  await db.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profile_picture , user]);
+  res.json({message:"profile pic url saved!"})
+} catch (error) {
+  res.status(500).json({message:"server error!"});
+}
+ 
 });
 app.put("/data/:id" , ensureAuthenticated, async(req,res)=>{
 try {

@@ -5,8 +5,21 @@ function Profile(){
         const file = e.target.files[0]
         if(file){
             setProfilePic(URL.createObjectURL(file))
+             const formData = new FormData();
+    formData.append("profilePic" , file);
+    fetch("http://localhost:3000/upload-profile", {
+        method:"PUT",
+        body:formData,
+        credentials:"include",
+    })
+    .then((res)=>console.log("upload successfull by react!!"))
+    .catch((res)=>console.error("error uploading in react!!" , error)
+    )
         }
+
     }
+
+   
  return(
    <div style={{ textAlign: "center", marginTop: "50px" }}>
     <img src={profilePic || "https://via.placeholder.com/150" } alt="profile pic"     style={{
