@@ -39,10 +39,10 @@ app.use(passport.session());
 db.connect();
 const storage = multer.diskStorage({
   destination: (req , file , cb)=>{
-    cb(null , "/uploads")
+    cb(null , "uploads/")
   },
   filename: (req , file , cb)=>{
-    const uniqueName =  Date.now + path.extname(file.originalname)
+    const uniqueName =  Date.now() + path.extname(file.originalname)
     cb(null , uniqueName)
   },
 });
@@ -335,17 +335,26 @@ app.post("/data" , ensureAuthenticated, async(req ,res)=>{
         res.sendStatus(500).send("Erorr adding data to db!!");
     }
 });
-app.put("/upload-profile" , ensureAuthenticated , upload.single(profile) , async(req,res)=>{
+app.put("/upload-profile" , ensureAuthenticated , upload.single("profile") , async(req,res)=>{
 try {
-   const {profile_picture} = req.body
+  //  const {profile_picture} = req.body
+      const profile_picture = `/uploads/${req.file.filename}`;
   const user = req.user.id
   await db.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profile_picture , user]);
   res.json({message:"profile pic url saved!"})
 } catch (error) {
-  res.status(500).json({message:"server error!"});
+  res.status(500).json({message:"server error in updating profile!"});
 }
  
 });
+app.get("/users" , ensureAuthenticated , async(req,res)=>{
+   try {
+    await db.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+    res.json.apply({message: "user profile returned successfully!!"})
+   } catch (error) {
+    res.status(500).json({message:"error fetching the user profile!!"})
+   }
+})
 app.put("/data/:id" , ensureAuthenticated, async(req,res)=>{
 try {
     const {title , category , amount , expense_date} =req.body
