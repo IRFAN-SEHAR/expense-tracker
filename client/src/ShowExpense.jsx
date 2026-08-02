@@ -40,19 +40,19 @@ setExpense(prev=>{
   
     return(
       
-        <div>
+        <div className={isEditing ? "expense-card editing" : "expense-card"}>
 
           {isEditing ? (
-            <form >
-               <label htmlFor="title">title</label>
-            <input   value={expense.title}  onChange={handleChanges} type="title" id="title" name="title" pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add title. e.g burger," required/>
-            <label htmlFor="category">category</label>
-            <input  value={expense.category} onChange={handleChanges} type="category"  id="category" name="category" pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
-            <label htmlFor="amount">amount</label>
-            <input value={expense.amount}  onChange={handleChanges} min={0} type="number" id="amount" name="amount" placeholder=" in Rs e.g 500rs" required/>
-            <label htmlFor="expense_date">expense date</label>
-            <input value={expense.expense_date} onChange={handleChanges}  type="d ate" name="expense_date" id="expense_date" required />
-            <button type="submit" onClick={handleClicks}>save</button>
+            <form className="expense-form">
+               <label className="field-label" htmlFor="title">title</label>
+            <input className="field-input"  value={expense.title}  onChange={handleChanges} type="title" id="title" name="title" pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add title. e.g burger," required/>
+            <label className="field-label" htmlFor="category">category</label>
+            <input className="field-input"  value={expense.category} onChange={handleChanges} type="category"  id="category" name="category" pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
+            <label className="field-label" htmlFor="amount">amount</label>
+            <input className="field-input" value={expense.amount}  onChange={handleChanges} min={0} type="number" id="amount" name="amount" placeholder=" in Rs e.g 500rs" required/>
+            <label className="field-label" htmlFor="expense_date">expense date</label>
+            <input className="field-input" value={expense.expense_date} onChange={handleChanges}  type="date" name="expense_date" id="expense_date" required />
+            <button className="btn btn-primary btn-block" type="submit" onClick={handleClicks}>save</button>
             </form>
           ):(
             <>
@@ -60,8 +60,8 @@ setExpense(prev=>{
               <p>{props.category}</p>
                 <p>{props.amount}</p>
                   <p>{props.expense_date}</p>
-                  <button onClick={()=>props.onDelete(props.id)}>delete</button>
-                  <button onClick={()=>setIsEditing(true)} >update</button>
+                  <button className="btn btn-danger btn-sm" onClick={()=>props.onDelete(props.id)}>delete</button>
+                  <button className="btn btn-ghost btn-sm" onClick={()=>setIsEditing(true)} >update</button>
                   </>
           )}
            

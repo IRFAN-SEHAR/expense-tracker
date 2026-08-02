@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "./config";
 import "./App.css";
 import AddExpense from "./AddExpense";
 import ShowExpense from "./ShowExpense";
@@ -17,7 +18,7 @@ function App() {
   const [user, setUser] = useState(null);       
   const [authChecked, setAuthChecked] = useState(false); 
   const [showRegister, setShowRegister] = useState(false);
-
+console.log(user)
   const months = [
     "All", "January", "February", "March", "April",
     "May", "June", "July", "August",
@@ -43,7 +44,7 @@ function App() {
 
   async function checkSession() {
     try {
-      const response = await fetch("http://localhost:3000/me", {
+      const response = await fetch(`http://localhost:3000/me`, {
         credentials: "include",
       });
       if (response.ok) {
@@ -149,23 +150,25 @@ function App() {
     return (
       <div>
         <Header />
-        {showRegister ? (
-          <>
-            <Register onRegisterSuccess={() => setShowRegister(false)} />
-            <p>
-              Already have an account?{" "}
-              <button onClick={() => setShowRegister(false)}>Log in</button>
-            </p>
-          </>
-        ) : (
-          <>
-            <Login onLoginSuccess={handleLoginSuccess} />
-            <p>
-              Don't have an account?{" "}
-              <button onClick={() => setShowRegister(true)}>Sign up</button>
-            </p>
-          </>
-        )}
+        <div className="auth-page">
+          {showRegister ? (
+            <>
+              <Register onRegisterSuccess={() => setShowRegister(false)} />
+              <p className="auth-switch">
+                Already have an account?{" "}
+                <button className="link-btn" onClick={() => setShowRegister(false)}>Log in</button>
+              </p>
+            </>
+          ) : (
+            <>
+              <Login onLoginSuccess={handleLoginSuccess} />
+              <p className="auth-switch">
+                Don't have an account?{" "}
+                <button className="link-btn" onClick={() => setShowRegister(true)}>Sign up</button>
+              </p>
+            </>
+          )}
+        </div>
         <Footer />
       </div>
     );
@@ -175,41 +178,56 @@ function App() {
   return (
     <div>
       <Header />
-      <button onClick={handleLogout}>Log out</button>
-      <AddExpense onAdd={addItems} />
+      <div className="dashboard">
+        <div className="topbar">
+          <button className="btn btn-ghost" onClick={handleLogout}>Log out</button>
+        </div>
 
-      <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
-        {months.map((month, index) => (
-          <option key={index} value={index}>
-            {month}
-          </option>
-        ))}
-      </select>
+        <Profile user={user} />
 
-      <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
-        <option value="">All</option>
-        {years.map((year, index) => (
-          <option key={index} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-      <Profile/>
-      <h2>Total Expense: Rs. {total ?? 0}</h2>
+        <div className="controls">
+          <AddExpense onAdd={addItems} />
 
-      {(item ?? []).map((e, index) => (
-        <ShowExpense
-          key={index}
-          id={e.id}
-          title={e.title}
-          category={e.category}
-          amount={e.amount}
-          expense_date={new Date(e.expense_date).toLocaleDateString("en-CA")}
-          onDelete={del}
-          onUpdate={update}
-        />
-      ))}
-      
+          <div className="filters">
+            <select className="select-pill" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+              {months.map((month, index) => (
+                <option key={index} value={index}>
+                  {month}
+                </option>
+              ))}
+            </select>
+
+            <select className="select-pill" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+              <option value="">All</option>
+              {years.map((year, index) => (
+                <option key={index} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="hero-card">
+          <span className="hero-eyebrow">Total spent</span>
+          <h2 className="hero-total">Rs. {total ?? 0}</h2>
+        </div>
+
+        <div className="expense-grid">
+          {(item ?? []).map((e, index) => (
+            <ShowExpense
+              key={index}
+              id={e.id}
+              title={e.title}
+              category={e.category}
+              amount={e.amount}
+              expense_date={new Date(e.expense_date).toLocaleDateString("en-CA")}
+              onDelete={del}
+              onUpdate={update}
+            />
+          ))}
+        </div>
+      </div>
 
       <Footer />
     </div>

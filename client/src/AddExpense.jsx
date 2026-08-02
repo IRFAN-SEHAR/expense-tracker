@@ -1,4 +1,5 @@
 import React,{useState} from "react";
+import { API_URL } from "./config";
 function AddExpense(props){
     const date = new Date().toLocaleString();
     const [items , setItems] = useState({
@@ -41,7 +42,7 @@ const [isAdd , setIsAdd] = useState(false);
 
      } );
     
-        await fetch(("http://localhost:3000/data"),{
+        await fetch(({API_URL} + "/data"),{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -69,22 +70,22 @@ const [isAdd , setIsAdd] = useState(false);
     }
     
 return(
-    <div>
+    <div className="add-expense">
         {isAdd ?(
-    <form>
-            <label htmlFor="title">title</label>
-            <input onChange={handleChange} type="title" id="title" name="title" value={items.title}  pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add title. e.g burger," required/>
-            <label htmlFor="category">category</label>
-            <input onChange={handleChange} type="text" id="category" name="category" value={items.category}  pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
-            <label htmlFor="amount">amount</label>
-            <input onChange={handleChange} type="number" id="amount" name="amount" value={items.amount} min={0} placeholder=" in Rs e.g 500rs" required/>
-            <label htmlFor="expense_date">expense date</label>
-            <input onChange={handleChange} type="date" name="expense_date" id="expense_date" required />
+    <form className="expense-form">
+            <label className="field-label" htmlFor="title">title</label>
+            <input className="field-input" onChange={handleChange} type="title" id="title" name="title" value={items.title}  pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add title. e.g burger," required/>
+            <label className="field-label" htmlFor="category">category</label>
+            <input className="field-input" onChange={handleChange} type="text" id="category" name="category" value={items.category}  pattern="[A-Za-z]+" maxLength={50} title="only letters and spacial allowed!" placeholder="add category e,g food," required/>
+            <label className="field-label" htmlFor="amount">amount</label>
+            <input className="field-input" onChange={handleChange} type="number" id="amount" name="amount" value={items.amount} min={0} placeholder=" in Rs e.g 500rs" required/>
+            <label className="field-label" htmlFor="expense_date">expense date</label>
+            <input className="field-input" onChange={handleChange} type="date" name="expense_date" id="expense_date" required />
           
-           <button type="submit" onClick={(event)=>{handleClick(event)}} >save</button>
+           <button className="btn btn-primary btn-block" type="submit" onClick={(event)=>{handleClick(event)}} >save</button>
         </form>
-        ):(<form>
-              <button onClick={() => setIsAdd(true)} >+Add</button>
+        ):(<form className="fab-form">
+              <button className="fab" onClick={() => setIsAdd(true)} >+Add</button>
         </form>)}
     
     </div>

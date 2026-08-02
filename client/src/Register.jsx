@@ -32,20 +32,20 @@ function Register({onRegisterSuccess}){
         
     }
     return(
-        <div>
-            <form >
-            <div>
-                <label htmlFor="email">email</label>
-                <input onChange={handleChange} type="email" name="username" id="email" value={items.username} autoComplete="email" required/>
+        <div className="auth-card">
+            <form className="auth-form">
+            <div className="field">
+                <label className="field-label" htmlFor="email">email</label>
+                <input className="field-input" onChange={handleChange} type="email" name="username" id="email" value={items.username} autoComplete="email" required/>
             </div>
-            <div>
-                <label htmlFor="password">password</label>
-                <input onChange={handleChange} type="password" name="password" id="password" value={items.password} autoComplete="new-password" required/>
+            <div className="field">
+                <label className="field-label" htmlFor="password">password</label>
+                <input className="field-input" onChange={handleChange} type="password" name="password" id="password" value={items.password} autoComplete="new-password" required/>
             </div>
-            <button type="submit" onClick={(event)=>{handleClick(event)}}>ok</button>
+            <button className="btn btn-primary btn-block" type="submit" onClick={(event)=>{handleClick(event)}}>ok</button>
             </form>
         
-            <a className="btn btn-block" href="http://localhost:3000/auth/google"role="button">
+            <a className="btn btn-google" href="http://localhost:3000/auth/google"role="button">
               <i className="fab fa-google"></i>
               Sign Up with Google
             </a>
