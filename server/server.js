@@ -48,7 +48,24 @@ const storage = multer.diskStorage({
 });
 const upload = multer({storage})
 app.use("/uploads", express.static("uploads"));
-app.use(cors({origin: "http://localhost:5173" , credentials: true, }))
+const allowedOrigin = (origin, callback) => {
+  // Allow requests with no origin (e.g. Postman)
+  if (!origin) return callback(null, true);
+
+  // Allow localhost and any local network IP
+  const regex =
+    /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):5173$/;
+
+  if (regex.test(origin)) {
+    return callback(null, true);
+  }
+
+  callback(new Error("Not allowed by CORS"));
+};
+app.use(cors({
+  origin: "http://192.168.1.4:5173",
+  credentials: true,
+}));
 app.use(express.static("public"));
 function ensureAuthenticated(req , res ,next){
   if (req.isAuthenticated()) {
@@ -109,6 +126,8 @@ app.post("/login", (req, res, next) => {
 
 
 app.get("/me", (req, res) => {
+    console.log("isAuthenticated:", req.isAuthenticated());
+  console.log("req.user:", req.user);
   if (req.isAuthenticated()) {
     res.json({ user: req.user });
   } else {
@@ -125,7 +144,7 @@ app.get("/me", (req, res) => {
    failureRedirect: "/login"
   }),
   (req,res)=>{
-    res.redirect("http://localhost:5173")
+   res.redirect(process.env.CLIENT_URL);
   }
 )
 // app.get("/me", (req, res) => {
@@ -197,7 +216,7 @@ passport.use("google" ,
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL:"http://localhost:3000/auth/google/callback",
-      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+      // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     } ,async (accessToken , refreshToken , profile , cb)=>{
       try {
         console.log(profile)

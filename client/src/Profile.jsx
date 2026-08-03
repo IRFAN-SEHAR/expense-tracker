@@ -1,4 +1,5 @@
 import React , {useState} from "react";
+import { API_URL } from "./config"
 function Profile(props){
     const [profilePic , setProfilePic] = useState(null);
     function handleChange(e){
@@ -8,7 +9,7 @@ function Profile(props){
              const formData = new FormData();
 
     formData.append("profile" , file);
-    fetch("http://localhost:3000/upload-profile", {
+    fetch(`${API_URL}/upload-profile`, {
         method:"PUT",
         body:formData,
         credentials:"include",
@@ -26,7 +27,7 @@ function Profile(props){
   props.user?.profile_picture
     ? props.user.profile_picture.startsWith("http")
       ? props.user.profile_picture
-      : `http://localhost:3000${props.user.profile_picture}`
+      : `${API_URL}${props.user.profile_picture}`
     : "https://placehold.co/150");  
     //  console.log(props.user.profile_picture);
 console.log(imageSrc);

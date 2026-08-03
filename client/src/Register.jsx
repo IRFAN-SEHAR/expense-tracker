@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_URL } from "./config";
 function Register({onRegisterSuccess}){
     const [items , setItems] = useState({
         username:"",
@@ -13,7 +14,7 @@ function Register({onRegisterSuccess}){
     }
    async function handleClick(event){
     event.preventDefault()
-          const response =    await fetch(("http://localhost:3000/signup"),{
+          const response =    await fetch((`${API_URL}/signup`),{
                 method:"POST",
                 headers:{
                     "Content-Type" : "application/json"
@@ -45,10 +46,14 @@ function Register({onRegisterSuccess}){
             <button className="btn btn-primary btn-block" type="submit" onClick={(event)=>{handleClick(event)}}>ok</button>
             </form>
         
-            <a className="btn btn-google" href="http://localhost:3000/auth/google"role="button">
-              <i className="fab fa-google"></i>
-              Sign Up with Google
-            </a>
+            <a
+  className="btn btn-google"
+  href={`${API_URL}/auth/google`}
+  role="button"
+>
+  <i className="fab fa-google"></i>
+  Sign Up with Google
+</a>
           </div>
        
     )

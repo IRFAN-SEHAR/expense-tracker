@@ -44,11 +44,13 @@ console.log(user)
 
   async function checkSession() {
     try {
-      const response = await fetch(`http://localhost:3000/me`, {
+      const response = await fetch(`${API_URL}/me`, {
         credentials: "include",
       });
+       console.log("Status:", response.status);
       if (response.ok) {
         const data = await response.json();
+          console.log("Response:", data);
         setUser(data.user);
       } else {
         setUser(null);
@@ -64,7 +66,7 @@ console.log(user)
   async function getData() {
     try {
       const response = await fetch(
-        `http://localhost:3000/data?month=${selectedMonth}&year=${selectedYear}`,
+        `${API_URL}/data?month=${selectedMonth}&year=${selectedYear}`,
         { credentials: "include" }
       );
 
@@ -89,7 +91,7 @@ console.log(user)
   }
 
   function del(id) {
-    fetch(`http://localhost:3000/data/${id}`, {
+    fetch(`${API_URL}/data/${id}`, {
       method: "DELETE",
       credentials: "include"
     })
@@ -101,7 +103,7 @@ console.log(user)
   }
 
   function update(id, updateNote) {
-    fetch(`http://localhost:3000/data/${id}`, {
+    fetch(`${API_URL}/data/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -122,7 +124,7 @@ console.log(user)
 
   async function handleLogout() {
     try {
-      await fetch("http://localhost:3000/logout", {
+      await fetch(`${API_URL}/logout`, {
         method: "POST",
         credentials: "include",
       });

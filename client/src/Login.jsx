@@ -1,4 +1,5 @@
 import React ,{useState} from "react";
+import { API_URL } from "./config"
 function Login({onLoginSuccess}){
     const [items , setItems]=useState({
         username:"",
@@ -13,7 +14,7 @@ function handleChange(event){
 }
 async function handleClick(event){
     event.preventDefault();
-   const response =  await fetch(("http://localhost:3000/login"),{
+   const response =  await fetch((`${API_URL}/login`),{
         method:"POST",
         headers:{
             "Content-type":"application/json"
@@ -46,7 +47,7 @@ return(
         </form>
          
           
-            <a className="btn btn-google" href="http://localhost:3000/auth/google" role="button">
+            <a className="btn btn-google" href={`${API_URL}/auth/google`} role="button">
               <i className="fab fa-google"></i>
               Sign In with Google
             </a>
