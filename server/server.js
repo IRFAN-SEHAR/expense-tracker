@@ -63,7 +63,7 @@ const allowedOrigin = (origin, callback) => {
   callback(new Error("Not allowed by CORS"));
 };
 app.use(cors({
-  origin: "http://192.168.1.4:5173",
+  origin: "http://10.109.96.32:5173",
   credentials: true,
 }));
 app.use(express.static("public"));
@@ -215,7 +215,7 @@ passport.use("google" ,
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:"http://localhost:3000/auth/google/callback",
+      callbackURL: "http://10.109.96.32:3000/auth/google/callback",
       // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     } ,async (accessToken , refreshToken , profile , cb)=>{
       try {
