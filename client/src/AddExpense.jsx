@@ -42,10 +42,12 @@ const [isAdd , setIsAdd] = useState(false);
 
      } );
     
-        await fetch(({API_URL} + "/data"),{
+        await fetch(`${API_URL}/data`,{
             method:"POST",
             headers:{
-                "Content-Type":"application/json"
+                "Content-Type":"application/json",
+                  "ngrok-skip-browser-warning": "true"
+
             },
             credentials: "include",
             body:JSON.stringify(items)

@@ -13,6 +13,7 @@ import pg from "pg"
 import { profile } from "console"
 dotenv.config()
 const app = express();
+app.set("trust proxy", 1);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json());
 const port = 3000;
@@ -29,7 +30,8 @@ app.use(session({
   resave:false,
   saveUninitialized:false,
    cookie: {
-      secure: false, // true only when using HTTPS in production
+      secure: true, // true only when using HTTPS in production
+      sameSite:"none",
       maxAge: 1000 * 60 * 60 * 24 // 1 day
     }
 }))
@@ -63,7 +65,7 @@ const allowedOrigin = (origin, callback) => {
   callback(new Error("Not allowed by CORS"));
 };
 app.use(cors({
-  origin: "http://10.109.96.32:5173",
+  origin: "http://192.168.1.3:5173", 
   credentials: true,
 }));
 app.use(express.static("public"));
@@ -215,7 +217,9 @@ passport.use("google" ,
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://10.109.96.32:3000/auth/google/callback",
+            callbackURL: "https://gimmick-earthling-friend.ngrok-free.dev/auth/google/callback",
+
+      // callbackURL: "http://10.109.96.32:3000/auth/google/callback",
       // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     } ,async (accessToken , refreshToken , profile , cb)=>{
       try {

@@ -67,7 +67,10 @@ console.log(user)
     try {
       const response = await fetch(
         `${API_URL}/data?month=${selectedMonth}&year=${selectedYear}`,
-        { credentials: "include" }
+        { credentials: "include", 
+           headers: {
+          "ngrok-skip-browser-warning": "true"
+        } }
       );
 
       if (!response.ok) {
@@ -93,7 +96,10 @@ console.log(user)
   function del(id) {
     fetch(`${API_URL}/data/${id}`, {
       method: "DELETE",
-      credentials: "include"
+      credentials: "include",
+       headers: {
+          "ngrok-skip-browser-warning": "true"
+        }
     })
       .then(res => res.json())
       .then(() => {
@@ -105,7 +111,8 @@ console.log(user)
   function update(id, updateNote) {
     fetch(`${API_URL}/data/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" ,   "ngrok-skip-browser-warning": "true"
+},
       credentials: "include",
       body: JSON.stringify(updateNote)
     })
@@ -127,6 +134,9 @@ console.log(user)
       await fetch(`${API_URL}/logout`, {
         method: "POST",
         credentials: "include",
+         headers: {
+          "ngrok-skip-browser-warning": "true"
+        }
       });
     } catch (err) {
       console.error(err);

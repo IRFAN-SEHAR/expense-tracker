@@ -17,7 +17,9 @@ function Register({onRegisterSuccess}){
           const response =    await fetch((`${API_URL}/signup`),{
                 method:"POST",
                 headers:{
-                    "Content-Type" : "application/json"
+                    "Content-Type" : "application/json",
+                  "ngrok-skip-browser-warning": "true"
+    
                 },
                 credentials: "include",
                 body:JSON.stringify(items)

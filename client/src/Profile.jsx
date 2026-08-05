@@ -13,6 +13,9 @@ function Profile(props){
         method:"PUT",
         body:formData,
         credentials:"include",
+         headers: {
+      "ngrok-skip-browser-warning": "true"
+    }
     })
     .then((res)=>console.log("upload successfull by react!!"))
     .catch((error) => {

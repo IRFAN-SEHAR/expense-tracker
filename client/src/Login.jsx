@@ -17,7 +17,8 @@ async function handleClick(event){
    const response =  await fetch((`${API_URL}/login`),{
         method:"POST",
         headers:{
-            "Content-type":"application/json"
+            "Content-type":"application/json",
+             "ngrok-skip-browser-warning": "true"
         },
         credentials: "include",
         body:JSON.stringify(items)
