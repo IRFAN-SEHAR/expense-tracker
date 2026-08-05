@@ -14,7 +14,7 @@ function handleChange(event){
 }
 async function handleClick(event){
     event.preventDefault();
-   const response =  await fetch((`${API_URL}/login`),{
+   const response =  await fetch(`${API_URL}/login`,{
         method:"POST",
         headers:{
             "Content-type":"application/json",

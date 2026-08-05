@@ -14,7 +14,7 @@ function Register({onRegisterSuccess}){
     }
    async function handleClick(event){
     event.preventDefault()
-          const response =    await fetch((`${API_URL}/signup`),{
+          const response =    await fetch(`${API_URL}/signup`,{
                 method:"POST",
                 headers:{
                     "Content-Type" : "application/json",
